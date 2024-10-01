@@ -17,11 +17,16 @@ class User(BaseModel):
 def get_all_users() -> List[User]:
     return users
 
+
 @app.post("/user/{username}/{age}")
 def create_user(user: User) -> User:
-    user.id = len(users)
+    if users:
+        user.id = users[-1].id + 1
+    else:
+        user.id = 1
     users.append(user)
     return user
+
 
 @app.put("/user/{user_id}/{username}/{age}")
 def update_user(user: User) -> User:
@@ -30,7 +35,8 @@ def update_user(user: User) -> User:
             if current_user.id == user.id:
                 users[users.index(current_user)] = user
                 return user
-        raise HTTPException(status_code=404, detail=f"User ID={user.id} was not found")
+        # raise HTTPException(status_code=404, detail=f"User ID={user.id} was not found")
+        raise IndexError()
     except IndexError:
         raise HTTPException(status_code=404, detail=f"User ID={user.id} was not found")
 
@@ -42,6 +48,7 @@ def delete_user(user_id: int) -> User:
             if current_user.id == user_id:
                 users.remove(current_user)
                 return current_user
-        raise HTTPException(status_code=404, detail=f"User ID={user_id} was not found")
+        # raise HTTPException(status_code=404, detail=f"User ID={user_id} was not found")
+        raise IndexError()
     except IndexError:
         raise HTTPException(status_code=404, detail=f"User ID={user_id} was not found")
